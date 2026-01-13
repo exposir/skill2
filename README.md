@@ -1,4 +1,4 @@
-# 自进化 Skill 编排系统
+# Darwin: 自进化 Skill 编排系统
 
 ![Version](https://img.shields.io/badge/version-2.0.0-blue.svg)
 ![License](https://img.shields.io/badge/license-MIT-green.svg)
@@ -27,12 +27,12 @@
 
 ### 环境要求
 
-| 要求 | 版本/说明 |
-|------|----------|
+| 要求        | 版本/说明                    |
+| ----------- | ---------------------------- |
 | Claude Code | 最新版本 (支持 skill 热重载) |
-| 操作系统 | macOS / Linux / Windows |
-| Node.js | 18+ (前端扩展需要) |
-| Git | 用于版本控制 |
+| 操作系统    | macOS / Linux / Windows      |
+| Node.js     | 18+ (前端扩展需要)           |
+| Git         | 用于版本控制                 |
 
 ### 安装步骤
 
@@ -71,21 +71,21 @@ skills.json             # ✅ 必需
 
 ### 核心命令速查
 
-| 命令 | 功能 | 示例 |
-|------|------|------|
-| `/genesis` | 生成新 skill | `/genesis "创建数据获取 skill"` |
-| `/registry` | 管理注册表 | `/registry action=list` |
-| `/orchestrate` | 编排执行 | `/orchestrate task="处理数据"` |
+| 命令           | 功能         | 示例                            |
+| -------------- | ------------ | ------------------------------- |
+| `/genesis`     | 生成新 skill | `/genesis "创建数据获取 skill"` |
+| `/registry`    | 管理注册表   | `/registry action=list`         |
+| `/orchestrate` | 编排执行     | `/orchestrate task="处理数据"`  |
 
 ### 前端扩展命令
 
-| 命令 | 功能 | 示例 |
-|------|------|------|
-| `/project-init` | 初始化项目 | `/project-init project_name="app"` |
-| `/module-gen` | 生成模块 | `/module-gen name="auth"` |
-| `/coordinate` | 协调开发 | `/coordinate action=plan task="..."` |
-| `/build` | 构建验证 | `/build action=all` |
-| `/contracts` | 契约管理 | `/contracts action=validate` |
+| 命令            | 功能       | 示例                                 |
+| --------------- | ---------- | ------------------------------------ |
+| `/project-init` | 初始化项目 | `/project-init project_name="app"`   |
+| `/module-gen`   | 生成模块   | `/module-gen name="auth"`            |
+| `/coordinate`   | 协调开发   | `/coordinate action=plan task="..."` |
+| `/build`        | 构建验证   | `/build action=all`                  |
+| `/contracts`    | 契约管理   | `/contracts action=validate`         |
 
 ### 常用操作
 
@@ -223,6 +223,7 @@ skills.json             # ✅ 必需
 ```
 
 Genesis 会自动：
+
 - 分析你的需求
 - 生成符合规范的 skill 文件到 `_generated/` 目录
 - 更新 `skills.json` 注册表
@@ -247,6 +248,7 @@ Genesis 会自动：
 ```
 
 Orchestrator 会自动：
+
 - 分析任务，匹配相关 skills
 - 按依赖关系排序执行
 - 管理 skills 之间的数据传递
@@ -256,7 +258,7 @@ Orchestrator 会自动：
 ## 目录结构
 
 ```
-skill2/
+darwin/
 │
 ├── _meta/                        # 元 Skill 层 (核心，请勿修改)
 │   │
@@ -390,6 +392,7 @@ Skills 之间通过 `upstream` 和 `downstream` 形成依赖关系：
 ```
 
 **关键规则：**
+
 - `skill-004` 的 upstream 是 `[skill-001, skill-002, skill-003]`
 - `skill-004` 必须等待所有上游 skills 完成后才执行
 - `skill-004` 可以读取所有上游 skills 的输出数据
@@ -447,22 +450,22 @@ Skills 之间通过 `upstream` 和 `downstream` 形成依赖关系：
 ```markdown
 ---
 # ==================== 基础信息 ====================
-id: skill-001-my-skill          # 唯一标识符
-name: my-skill                  # 人类可读名称
-version: 1.0.0                  # 语义化版本号
-description: 这个 skill 做什么    # 简短描述
-directory: _generated/          # 所在目录
+id: skill-001-my-skill # 唯一标识符
+name: my-skill # 人类可读名称
+version: 1.0.0 # 语义化版本号
+description: 这个 skill 做什么 # 简短描述
+directory: _generated/ # 所在目录
 
 # ==================== 依赖关系 ====================
-upstream:                       # 上游依赖 (此 skill 需要的输入来源)
+upstream: # 上游依赖 (此 skill 需要的输入来源)
   - skill-000-init
-downstream:                     # 下游消费者 (使用此 skill 输出的 skills)
+downstream: # 下游消费者 (使用此 skill 输出的 skills)
   - skill-002-output
 
 # ==================== 输入输出 ====================
-inputs:                         # 输入参数定义
+inputs: # 输入参数定义
   - name: url
-    type: string                # string | number | boolean | object | array
+    type: string # string | number | boolean | object | array
     required: true
     description: API 地址
   - name: headers
@@ -470,7 +473,7 @@ inputs:                         # 输入参数定义
     required: false
     description: 请求头
 
-outputs:                        # 输出定义
+outputs: # 输出定义
   - name: data
     type: object
     description: 返回的 JSON 数据
@@ -479,10 +482,10 @@ outputs:                        # 输出定义
     description: HTTP 状态码
 
 # ==================== 元信息 ====================
-created_by: genesis             # genesis | manual
+created_by: genesis # genesis | manual
 created_at: 2026-01-14
 updated_at: 2026-01-14
-tags:                           # 分类标签
+tags: # 分类标签
   - api
   - fetch
   - http
@@ -501,24 +504,30 @@ tags:                           # 分类标签
 当用户调用这个 skill 时，执行以下步骤：
 
 ### Step 1: 读取输入
+
 从用户参数或上游 skill 获取输入数据。
 
 ### Step 2: 执行核心逻辑
+
 具体的操作步骤...
 
 ### Step 3: 写入状态
+
 将结果写入 state.json。
 
 ### Step 4: 返回结果
+
 向用户展示结果。
 
 ## Communication
 
 ### Reading State
 ```
+
 从 ./context/state.json 读取
 访问 data.<upstream-skill-id>.output
-```
+
+````
 
 ### Writing State
 ```json
@@ -530,7 +539,7 @@ tags:                           # 分类标签
     }
   }
 }
-```
+````
 
 ## Error Handling
 
@@ -540,9 +549,11 @@ tags:                           # 分类标签
 ## Examples
 
 ### Example 1: 基本用法
+
 输入: ...
 输出: ...
-```
+
+````
 
 ---
 
@@ -612,7 +623,7 @@ tags:                           # 分类标签
     }
   }
 }
-```
+````
 
 ### 状态流转图
 
@@ -747,14 +758,14 @@ Skills 通过 `state.json` 共享数据：
 
 ### Registry (注册表管理)
 
-| 命令 | 功能 |
-|------|------|
-| `/registry action=list` | 列出所有已注册的 skills |
-| `/registry action=graph` | 显示 DAG 依赖关系图 |
-| `/registry action=validate` | 验证注册表和文件一致性 |
-| `/registry action=add skill_id=xxx` | 手动添加 skill |
-| `/registry action=remove skill_id=xxx` | 移除 skill |
-| `/registry action=update skill_id=xxx` | 更新 skill 元数据 |
+| 命令                                   | 功能                    |
+| -------------------------------------- | ----------------------- |
+| `/registry action=list`                | 列出所有已注册的 skills |
+| `/registry action=graph`               | 显示 DAG 依赖关系图     |
+| `/registry action=validate`            | 验证注册表和文件一致性  |
+| `/registry action=add skill_id=xxx`    | 手动添加 skill          |
+| `/registry action=remove skill_id=xxx` | 移除 skill              |
+| `/registry action=update skill_id=xxx` | 更新 skill 元数据       |
 
 ### Orchestrator (执行编排器)
 
@@ -929,13 +940,13 @@ Skills 通过 `state.json` 共享数据：
 
 ### 错误类型和处理策略
 
-| 错误类型 | 处理策略 | 说明 |
-|---------|---------|------|
-| Skill 不存在 | 报错 | 提示用户创建或检查拼写 |
-| 上游失败 | skip / stop | 根据配置决定是否继续 |
-| 循环依赖 | 拒绝 | 注册时检测并拒绝 |
-| 超时 | retry | 默认重试 3 次 |
-| 文件缺失 | 标记 missing | 在 validate 时报告 |
+| 错误类型     | 处理策略     | 说明                   |
+| ------------ | ------------ | ---------------------- |
+| Skill 不存在 | 报错         | 提示用户创建或检查拼写 |
+| 上游失败     | skip / stop  | 根据配置决定是否继续   |
+| 循环依赖     | 拒绝         | 注册时检测并拒绝       |
+| 超时         | retry        | 默认重试 3 次          |
+| 文件缺失     | 标记 missing | 在 validate 时报告     |
 
 ### 错误输出格式
 
@@ -958,16 +969,16 @@ Skills 通过 `state.json` 共享数据：
 
 ## 文件说明
 
-| 文件 | 类型 | 作用 | 可否修改 |
-|------|------|------|---------|
-| `skills.json` | 配置 | DAG 注册表 | 自动维护 |
-| `context/state.json` | 状态 | 运行时状态 | 自动维护 |
-| `_meta/genesis.md` | 元 Skill | 生成新 skill | ❌ 不建议 |
-| `_meta/registry.md` | 元 Skill | 注册表管理 | ❌ 不建议 |
-| `_meta/orchestrator.md` | 元 Skill | 执行编排 | ❌ 不建议 |
-| `_core/skill-template.md` | 文档 | 模板规范 | ✅ 可自定义 |
-| `_core/communication.md` | 文档 | 通信协议 | ✅ 可扩展 |
-| `_generated/*.md` | Skill | 你的 skills | ✅ 自由编辑 |
+| 文件                      | 类型     | 作用         | 可否修改    |
+| ------------------------- | -------- | ------------ | ----------- |
+| `skills.json`             | 配置     | DAG 注册表   | 自动维护    |
+| `context/state.json`      | 状态     | 运行时状态   | 自动维护    |
+| `_meta/genesis.md`        | 元 Skill | 生成新 skill | ❌ 不建议   |
+| `_meta/registry.md`       | 元 Skill | 注册表管理   | ❌ 不建议   |
+| `_meta/orchestrator.md`   | 元 Skill | 执行编排     | ❌ 不建议   |
+| `_core/skill-template.md` | 文档     | 模板规范     | ✅ 可自定义 |
+| `_core/communication.md`  | 文档     | 通信协议     | ✅ 可扩展   |
+| `_generated/*.md`         | Skill    | 你的 skills  | ✅ 自由编辑 |
 
 ---
 
@@ -1043,6 +1054,7 @@ Skills 通过 `state.json` 共享数据：
 ```
 
 生成：
+
 - 项目目录结构
 - package.json, tsconfig.json, vite.config.ts
 - 模块注册表
@@ -1056,6 +1068,7 @@ Skills 通过 `state.json` 共享数据：
 ```
 
 每个模块生成：
+
 - `src/modules/<name>/` - 模块代码目录
 - `src/contracts/<name>.contract.ts` - 接口契约
 - `_generated/skill-module-<name>.md` - 模块维护 skill
@@ -1068,6 +1081,7 @@ Skills 通过 `state.json` 共享数据：
 ```
 
 协调器会：
+
 - 分析任务涉及的模块
 - 按依赖关系编排执行
 - 并行执行无依赖模块
@@ -1080,6 +1094,7 @@ Skills 通过 `state.json` 共享数据：
 ```
 
 执行：
+
 - ESLint 代码检查
 - TypeScript 类型检查
 - 单元测试
@@ -1089,24 +1104,24 @@ Skills 通过 `state.json` 共享数据：
 
 ## 前端 Skill 命令参考
 
-| 命令 | 功能 | 示例 |
-|------|------|------|
-| `/project-init` | 初始化前端项目 | `/project-init project_name="app"` |
-| `/module-gen` | 生成业务模块 | `/module-gen name="auth" type="feature"` |
-| `/contracts` | 管理接口契约 | `/contracts action=validate` |
-| `/build` | 构建验证 | `/build action=all` |
-| `/coordinate` | 多模块协调 | `/coordinate action=plan task="..."` |
-| `/skill-module-*` | 模块维护 | `/skill-module-auth action=implement` |
+| 命令              | 功能           | 示例                                     |
+| ----------------- | -------------- | ---------------------------------------- |
+| `/project-init`   | 初始化前端项目 | `/project-init project_name="app"`       |
+| `/module-gen`     | 生成业务模块   | `/module-gen name="auth" type="feature"` |
+| `/contracts`      | 管理接口契约   | `/contracts action=validate`             |
+| `/build`          | 构建验证       | `/build action=all`                      |
+| `/coordinate`     | 多模块协调     | `/coordinate action=plan task="..."`     |
+| `/skill-module-*` | 模块维护       | `/skill-module-auth action=implement`    |
 
 ---
 
 ## 模块类型
 
-| 类型 | 说明 | 示例 |
-|------|------|------|
+| 类型      | 说明         | 示例                       |
+| --------- | ------------ | -------------------------- |
 | `feature` | 业务功能模块 | auth, user, product, order |
-| `shared` | 共享功能模块 | ui, form, table, modal |
-| `core` | 核心基础模块 | api, store, router, i18n |
+| `shared`  | 共享功能模块 | ui, form, table, modal     |
+| `core`    | 核心基础模块 | api, store, router, i18n   |
 
 ---
 
@@ -1148,28 +1163,28 @@ src/modules/<name>/
 // src/contracts/auth.contract.ts
 
 // 类型导出
-export type { AuthState, AuthData } from '@modules/auth/types'
+export type { AuthState, AuthData } from "@modules/auth/types";
 
 // 接口定义
 export interface IAuthModule {
-  getState(): AuthState
-  login(params: LoginParams): Promise<AuthData>
-  logout(): void
+  getState(): AuthState;
+  login(params: LoginParams): Promise<AuthData>;
+  logout(): void;
 }
 
 // 导出清单
 export const AUTH_EXPORTS = {
-  components: ['AuthProvider', 'AuthGuard'],
-  hooks: ['useAuth'],
-  services: ['authService']
-} as const
+  components: ["AuthProvider", "AuthGuard"],
+  hooks: ["useAuth"],
+  services: ["authService"],
+} as const;
 ```
 
 其他模块通过契约引用：
 
 ```typescript
-import { useAuth, AuthProvider } from '@modules/auth'
-import type { AuthState } from '@contracts/auth.contract'
+import { useAuth, AuthProvider } from "@modules/auth";
+import type { AuthState } from "@contracts/auth.contract";
 ```
 
 ---
@@ -1241,10 +1256,10 @@ skill2/
 
 ## 版本历史
 
-| 版本 | 日期 | 变更 |
-|------|------|------|
+| 版本  | 日期       | 变更                             |
+| ----- | ---------- | -------------------------------- |
 | 2.0.0 | 2026-01-14 | 添加前端开发扩展，支持超大型项目 |
-| 1.0.0 | 2026-01-14 | 初始版本，包含核心三元 Skill |
+| 1.0.0 | 2026-01-14 | 初始版本，包含核心三元 Skill     |
 
 ---
 
@@ -1252,13 +1267,13 @@ skill2/
 
 ### 当前限制
 
-| 限制 | 说明 | 计划解决 |
-|------|------|---------|
-| **单会话状态** | state.json 在会话间不自动持久化 | v2.1 |
-| **无实时协作** | 不支持多用户同时编辑同一 skill | v3.0 |
-| **手动依赖声明** | 需要手动指定 upstream/downstream | v2.2 |
-| **无回滚机制** | skill 修改后无法自动回滚 | v2.1 |
-| **单项目范围** | skills 不能跨项目共享 | v3.0 |
+| 限制             | 说明                             | 计划解决 |
+| ---------------- | -------------------------------- | -------- |
+| **单会话状态**   | state.json 在会话间不自动持久化  | v2.1     |
+| **无实时协作**   | 不支持多用户同时编辑同一 skill   | v3.0     |
+| **手动依赖声明** | 需要手动指定 upstream/downstream | v2.2     |
+| **无回滚机制**   | skill 修改后无法自动回滚         | v2.1     |
+| **单项目范围**   | skills 不能跨项目共享            | v3.0     |
 
 ### 不适用场景
 
@@ -1302,6 +1317,7 @@ A: 可以。只需在 `_generated/` 目录下创建符合模板格式的 `.md` �
 **Q: 如何处理 skill 执行失败？**
 
 A: 系统会在 `state.json` 中记录错误信息。Orchestrator 支持三种策略：
+
 - `stop`: 停止整个管道
 - `skip`: 跳过失败的 skill 继续执行
 - `retry`: 重试失败的 skill（最多 3 次）
@@ -1309,6 +1325,7 @@ A: 系统会在 `state.json` 中记录错误信息。Orchestrator 支持三种�
 **Q: 如何调试 skill？**
 
 A:
+
 1. 查看 `context/state.json` 中的执行状态
 2. 使用 `/registry action=validate` 检查注册表一致性
 3. 检查 skill 文件的 YAML 元数据格式是否正确
@@ -1316,6 +1333,7 @@ A:
 **Q: 循环依赖怎么处理？**
 
 A: 系统在注册时会自动检测循环依赖并拒绝。如果需要双向通信，建议：
+
 1. 提取共享逻辑到独立 skill
 2. 使用事件驱动模式
 3. 重新设计依赖关系
@@ -1325,6 +1343,7 @@ A: 系统在注册时会自动检测循环依赖并拒绝。如果需要双向�
 **Q: 可以用于 Vue/Svelte 项目吗？**
 
 A: 是的。`/project-init` 支持 `framework` 参数：
+
 ```
 /project-init project_name="app" framework="vue"
 /project-init project_name="app" framework="svelte"
