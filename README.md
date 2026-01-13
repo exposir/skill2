@@ -1,6 +1,110 @@
 # 自进化 Skill 编排系统
 
+![Version](https://img.shields.io/badge/version-2.0.0-blue.svg)
+![License](https://img.shields.io/badge/license-MIT-green.svg)
+![Platform](https://img.shields.io/badge/platform-Claude%20Code-purple.svg)
+![Status](https://img.shields.io/badge/status-active-success.svg)
+
 一个基于 Claude Code skill 热重载机制的**自进化 AI Agent 框架**，通过元编程实现 skill 的自动生成、扩展和图结构编排。
+
+---
+
+## 目录
+
+- [前置条件](#前置条件)
+- [快速索引](#快速索引)
+- [系统架构](#系统架构)
+- [快速开始](#快速开始)
+- [核心概念](#核心概念)
+- [前端开发扩展](#前端开发扩展)
+- [限制与边界](#限制与边界)
+- [FAQ](#faq)
+- [路线图](#路线图)
+
+---
+
+## 前置条件
+
+### 环境要求
+
+| 要求 | 版本/说明 |
+|------|----------|
+| Claude Code | 最新版本 (支持 skill 热重载) |
+| 操作系统 | macOS / Linux / Windows |
+| Node.js | 18+ (前端扩展需要) |
+| Git | 用于版本控制 |
+
+### 安装步骤
+
+```bash
+# 1. 克隆或复制项目到目标目录
+git clone <repo-url> my-skill-project
+cd my-skill-project
+
+# 2. 确保目录结构完整
+ls -la
+# 应该看到: _meta/, _core/, _generated/, context/, skills.json
+
+# 3. 在 Claude Code 中打开项目
+claude .
+
+# 4. 验证系统可用
+/registry action=list
+```
+
+### 项目结构验证
+
+```bash
+# 必需的目录和文件
+_meta/genesis.md        # ✅ 必需
+_meta/registry.md       # ✅ 必需
+_meta/orchestrator.md   # ✅ 必需
+_core/skill-template.md # ✅ 必需
+_core/communication.md  # ✅ 必需
+context/state.json      # ✅ 必需
+skills.json             # ✅ 必需
+```
+
+---
+
+## 快速索引
+
+### 核心命令速查
+
+| 命令 | 功能 | 示例 |
+|------|------|------|
+| `/genesis` | 生成新 skill | `/genesis "创建数据获取 skill"` |
+| `/registry` | 管理注册表 | `/registry action=list` |
+| `/orchestrate` | 编排执行 | `/orchestrate task="处理数据"` |
+
+### 前端扩展命令
+
+| 命令 | 功能 | 示例 |
+|------|------|------|
+| `/project-init` | 初始化项目 | `/project-init project_name="app"` |
+| `/module-gen` | 生成模块 | `/module-gen name="auth"` |
+| `/coordinate` | 协调开发 | `/coordinate action=plan task="..."` |
+| `/build` | 构建验证 | `/build action=all` |
+| `/contracts` | 契约管理 | `/contracts action=validate` |
+
+### 常用操作
+
+```bash
+# 创建新 skill
+/genesis "你的需求描述"
+
+# 查看所有 skills
+/registry action=list
+
+# 查看依赖图
+/registry action=graph
+
+# 执行 skill 管道
+/orchestrate task="任务描述"
+
+# 验证注册表一致性
+/registry action=validate
+```
 
 ---
 
@@ -878,8 +982,6 @@ Skills 通过 `state.json` 共享数据：
 
 ---
 
----
-
 # 前端开发扩展
 
 ## 前端开发架构
@@ -1143,6 +1245,132 @@ skill2/
 |------|------|------|
 | 2.0.0 | 2026-01-14 | 添加前端开发扩展，支持超大型项目 |
 | 1.0.0 | 2026-01-14 | 初始版本，包含核心三元 Skill |
+
+---
+
+## 限制与边界
+
+### 当前限制
+
+| 限制 | 说明 | 计划解决 |
+|------|------|---------|
+| **单会话状态** | state.json 在会话间不自动持久化 | v2.1 |
+| **无实时协作** | 不支持多用户同时编辑同一 skill | v3.0 |
+| **手动依赖声明** | 需要手动指定 upstream/downstream | v2.2 |
+| **无回滚机制** | skill 修改后无法自动回滚 | v2.1 |
+| **单项目范围** | skills 不能跨项目共享 | v3.0 |
+
+### 不适用场景
+
+- **实时系统**: 不适合需要毫秒级响应的场景
+- **大规模数据处理**: 不适合处理 GB 级数据
+- **生产环境部署**: 这是开发辅助工具，不是运行时框架
+- **非 Claude Code 环境**: 依赖 Claude Code 的 skill 机制
+
+### 最佳实践
+
+```
+✅ 适合                          ❌ 不适合
+─────────────────────────────────────────────────
+开发流程自动化                    实时数据处理
+代码生成和重构                    大规模并发请求
+模块化前端开发                    生产环境服务
+任务编排和协调                    跨团队实时协作
+原型快速迭代                      长期数据存储
+```
+
+---
+
+## FAQ
+
+### 基础问题
+
+**Q: Skill 和普通脚本有什么区别？**
+
+A: Skill 是 `.md` 文件，包含给 Claude 的**指令**而不是可执行代码。Claude 读取指令后执行相应操作。这使得 skill 可以用自然语言描述复杂逻辑。
+
+**Q: 热重载是怎么工作的？**
+
+A: 当 `_generated/` 目录下的文件发生变化时，Claude Code 会自动检测并重新加载 skill 定义。整个过程不到 1 秒。
+
+**Q: 可以手动创建 skill 吗？**
+
+A: 可以。只需在 `_generated/` 目录下创建符合模板格式的 `.md` 文件，然后运行 `/registry action=add` 注册即可。
+
+### 技术问题
+
+**Q: 如何处理 skill 执行失败？**
+
+A: 系统会在 `state.json` 中记录错误信息。Orchestrator 支持三种策略：
+- `stop`: 停止整个管道
+- `skip`: 跳过失败的 skill 继续执行
+- `retry`: 重试失败的 skill（最多 3 次）
+
+**Q: 如何调试 skill？**
+
+A:
+1. 查看 `context/state.json` 中的执行状态
+2. 使用 `/registry action=validate` 检查注册表一致性
+3. 检查 skill 文件的 YAML 元数据格式是否正确
+
+**Q: 循环依赖怎么处理？**
+
+A: 系统在注册时会自动检测循环依赖并拒绝。如果需要双向通信，建议：
+1. 提取共享逻辑到独立 skill
+2. 使用事件驱动模式
+3. 重新设计依赖关系
+
+### 前端扩展问题
+
+**Q: 可以用于 Vue/Svelte 项目吗？**
+
+A: 是的。`/project-init` 支持 `framework` 参数：
+```
+/project-init project_name="app" framework="vue"
+/project-init project_name="app" framework="svelte"
+```
+
+**Q: 模块间如何通信？**
+
+A: 通过接口契约（contracts）。每个模块导出 TypeScript 接口，其他模块通过契约引用，确保类型安全。
+
+**Q: 如何处理模块冲突？**
+
+A: 使用 `/coordinate action=resolve` 命令，系统会检测并提供解决方案。
+
+---
+
+## 路线图
+
+### v2.1 (计划中)
+
+- [ ] **状态持久化**: 支持 state.json 跨会话保持
+- [ ] **回滚机制**: skill 修改历史和回滚
+- [ ] **性能优化**: 大型 DAG 的拓扑排序优化
+- [ ] **日志系统**: 详细的执行日志和追踪
+
+### v2.2 (规划中)
+
+- [ ] **自动依赖推断**: 基于代码分析自动识别依赖
+- [ ] **Skill 测试框架**: 为 skills 编写和运行测试
+- [ ] **可视化工具**: DAG 依赖关系可视化
+- [ ] **模板库**: 常用 skill 模板库
+
+### v3.0 (愿景)
+
+- [ ] **多项目支持**: skills 跨项目共享和引用
+- [ ] **团队协作**: 多用户同时开发支持
+- [ ] **插件系统**: 第三方 skill 扩展
+- [ ] **云端同步**: skill 定义云端备份
+
+### 贡献指南
+
+欢迎贡献！你可以：
+
+1. **扩展 Skill**: 在 `_generated/` 中添加新的通用 skill
+2. **改进模板**: 优化 `_core/skill-template.md`
+3. **添加前端模块模板**: 扩展 `templates/` 目录
+4. **报告问题**: 提交 issue 描述问题或建议
 
 ---
 
