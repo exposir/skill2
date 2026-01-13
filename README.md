@@ -878,10 +878,270 @@ Skills 通过 `state.json` 共享数据：
 
 ---
 
+---
+
+# 前端开发扩展
+
+## 前端开发架构
+
+系统已扩展支持**超大型前端项目开发**，通过模块化 skill 实现多模块并行开发。
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                           前端开发 Skill 架构                                │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+                              用户需求
+                                 │
+                                 ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                        前端元 Skill 层                                       │
+│                                                                             │
+│  ┌─────────────┐    ┌─────────────┐    ┌─────────────┐    ┌─────────────┐  │
+│  │ project-init│───▶│module-gen   │───▶│ contracts   │───▶│   build     │  │
+│  │ (项目初始化) │    │ (模块生成)   │    │ (接口契约)   │    │ (构建验证)   │  │
+│  └─────────────┘    └──────┬──────┘    └──────┬──────┘    └─────────────┘  │
+│                            │                  │                             │
+│                            └────────┬─────────┘                             │
+│                                     ▼                                       │
+│                            ┌─────────────┐                                  │
+│                            │ coordinator │                                  │
+│                            │ (模块协调器) │                                  │
+│                            └─────────────┘                                  │
+└─────────────────────────────────────────────────────────────────────────────┘
+                                     │
+                                     ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                         模块 Skill 层                                        │
+│                                                                             │
+│  ┌───────────────┐  ┌───────────────┐  ┌───────────────┐  ┌───────────────┐ │
+│  │skill-module-  │  │skill-module-  │  │skill-module-  │  │skill-module-  │ │
+│  │    auth       │  │    api        │  │    user       │  │    ui         │ │
+│  └───────┬───────┘  └───────┬───────┘  └───────┬───────┘  └───────┬───────┘ │
+│          │                  │                  │                  │         │
+└──────────┼──────────────────┼──────────────────┼──────────────────┼─────────┘
+           │                  │                  │                  │
+           ▼                  ▼                  ▼                  ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                          代码层 (src/)                                       │
+│                                                                             │
+│  src/modules/auth/    src/modules/api/    src/modules/user/   src/modules/ui│
+│  src/contracts/auth.contract.ts  api.contract.ts  user.contract.ts  ...     │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## 前端开发快速开始
+
+### 1. 初始化项目
+
+```
+/project-init project_name="my-enterprise-app" framework="react"
+```
+
+生成：
+- 项目目录结构
+- package.json, tsconfig.json, vite.config.ts
+- 模块注册表
+
+### 2. 创建业务模块
+
+```
+/module-gen name="auth" type="feature"
+/module-gen name="api" type="core"
+/module-gen name="user" type="feature" dependencies=["auth", "api"]
+```
+
+每个模块生成：
+- `src/modules/<name>/` - 模块代码目录
+- `src/contracts/<name>.contract.ts` - 接口契约
+- `_generated/skill-module-<name>.md` - 模块维护 skill
+
+### 3. 协调多模块开发
+
+```
+/coordinate action=plan task="实现用户登录功能"
+/coordinate action=execute
+```
+
+协调器会：
+- 分析任务涉及的模块
+- 按依赖关系编排执行
+- 并行执行无依赖模块
+- 验证构建结果
+
+### 4. 验证构建
+
+```
+/build action=all
+```
+
+执行：
+- ESLint 代码检查
+- TypeScript 类型检查
+- 单元测试
+- 构建验证
+
+---
+
+## 前端 Skill 命令参考
+
+| 命令 | 功能 | 示例 |
+|------|------|------|
+| `/project-init` | 初始化前端项目 | `/project-init project_name="app"` |
+| `/module-gen` | 生成业务模块 | `/module-gen name="auth" type="feature"` |
+| `/contracts` | 管理接口契约 | `/contracts action=validate` |
+| `/build` | 构建验证 | `/build action=all` |
+| `/coordinate` | 多模块协调 | `/coordinate action=plan task="..."` |
+| `/skill-module-*` | 模块维护 | `/skill-module-auth action=implement` |
+
+---
+
+## 模块类型
+
+| 类型 | 说明 | 示例 |
+|------|------|------|
+| `feature` | 业务功能模块 | auth, user, product, order |
+| `shared` | 共享功能模块 | ui, form, table, modal |
+| `core` | 核心基础模块 | api, store, router, i18n |
+
+---
+
+## 模块目录结构
+
+```
+src/modules/<name>/
+├── index.ts                    # 模块入口和导出
+├── types.ts                    # 类型定义
+├── constants.ts                # 常量
+│
+├── components/                 # React 组件
+│   ├── index.ts
+│   └── <Name>Container.tsx
+│
+├── hooks/                      # React Hooks
+│   ├── index.ts
+│   └── use<Name>.ts
+│
+├── services/                   # 业务服务
+│   ├── index.ts
+│   └── <name>.service.ts
+│
+├── store/                      # 状态管理
+│   ├── index.ts
+│   └── <name>.slice.ts
+│
+└── __tests__/                  # 测试
+    └── <name>.test.ts
+```
+
+---
+
+## 接口契约系统
+
+契约文件定义模块间的接口规范：
+
+```typescript
+// src/contracts/auth.contract.ts
+
+// 类型导出
+export type { AuthState, AuthData } from '@modules/auth/types'
+
+// 接口定义
+export interface IAuthModule {
+  getState(): AuthState
+  login(params: LoginParams): Promise<AuthData>
+  logout(): void
+}
+
+// 导出清单
+export const AUTH_EXPORTS = {
+  components: ['AuthProvider', 'AuthGuard'],
+  hooks: ['useAuth'],
+  services: ['authService']
+} as const
+```
+
+其他模块通过契约引用：
+
+```typescript
+import { useAuth, AuthProvider } from '@modules/auth'
+import type { AuthState } from '@contracts/auth.contract'
+```
+
+---
+
+## 多模块开发工作流
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                     多模块开发流程                               │
+└─────────────────────────────────────────────────────────────────┘
+
+  1. 需求分析            2. 任务分解            3. 并行开发
+     ┌─────────┐           ┌─────────┐           ┌─────────┐
+     │ 用户需求 │──────────▶│ 模块拆分 │──────────▶│ 并行执行 │
+     └─────────┘           └─────────┘           └─────────┘
+                                                      │
+                                               ┌──────┴──────┐
+                                               ▼             ▼
+                                          [auth skill]  [api skill]
+                                               │             │
+                                               └──────┬──────┘
+                                                      ▼
+  4. 契约验证            5. 集成测试            6. 构建发布
+     ┌─────────┐           ┌─────────┐           ┌─────────┐
+     │ 接口对齐 │◀──────────│ 功能验证 │◀──────────│ 生产构建 │
+     └─────────┘           └─────────┘           └─────────┘
+```
+
+---
+
+## 前端扩展目录结构
+
+```
+skill2/
+├── _meta/
+│   ├── genesis.md              # 核心: Skill 生成器
+│   ├── registry.md             # 核心: 注册表管理
+│   ├── orchestrator.md         # 核心: 执行编排
+│   │
+│   └── frontend/               # 前端扩展 Skills
+│       ├── project-init.md     # 项目初始化
+│       ├── module-generator.md # 模块生成器
+│       ├── contracts.md        # 契约管理
+│       ├── build.md            # 构建验证
+│       └── coordinator.md      # 模块协调器
+│
+├── _generated/                 # 生成的模块 Skills
+│   ├── skill-module-auth.md
+│   ├── skill-module-api.md
+│   └── ...
+│
+├── src/                        # 前端代码目录
+│   ├── modules/               # 业务模块
+│   │   ├── auth/
+│   │   ├── api/
+│   │   └── ...
+│   ├── contracts/             # 接口契约
+│   ├── shared/                # 共享代码
+│   └── app/                   # 应用入口
+│
+├── templates/                  # 代码模板
+│   └── module/
+│       └── skill-template.md
+│
+└── skills.json                 # 注册表 (含前端扩展)
+```
+
+---
+
 ## 版本历史
 
 | 版本 | 日期 | 变更 |
 |------|------|------|
+| 2.0.0 | 2026-01-14 | 添加前端开发扩展，支持超大型项目 |
 | 1.0.0 | 2026-01-14 | 初始版本，包含核心三元 Skill |
 
 ---
