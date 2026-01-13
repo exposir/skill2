@@ -1,0 +1,61 @@
+{
+  "version": "1.0.0",
+  "description": "Self-evolving skill registry - DAG structure for skill orchestration",
+  "updated_at": "2026-01-14",
+  "skills": {
+    "genesis": {
+      "id": "genesis",
+      "name": "Genesis",
+      "description": "Meta skill that generates new skills based on requirements",
+      "path": "_meta/genesis.md",
+      "type": "meta",
+      "upstream": [],
+      "downstream": ["*"],
+      "version": "1.0.0",
+      "status": "active"
+    },
+    "registry": {
+      "id": "registry",
+      "name": "Registry Manager",
+      "description": "Manages skill registration, updates, and dependency tracking",
+      "path": "_meta/registry.md",
+      "type": "meta",
+      "upstream": ["genesis"],
+      "downstream": ["*"],
+      "version": "1.0.0",
+      "status": "active"
+    },
+    "orchestrator": {
+      "id": "orchestrator",
+      "name": "Orchestrator",
+      "description": "Executes skills in DAG topological order with state management",
+      "path": "_meta/orchestrator.md",
+      "type": "meta",
+      "upstream": ["registry"],
+      "downstream": ["*"],
+      "version": "1.0.0",
+      "status": "active"
+    },
+    "skill-001-hello-world": {
+      "id": "skill-001-hello-world",
+      "name": "Hello World",
+      "description": "Demo skill - demonstrates basic skill structure and communication",
+      "path": "_generated/skill-001-hello-world.md",
+      "type": "generated",
+      "upstream": [],
+      "downstream": [],
+      "version": "1.0.0",
+      "status": "active",
+      "created_by": "genesis",
+      "tags": ["example", "demo"]
+    }
+  },
+  "graph": {
+    "nodes": ["genesis", "registry", "orchestrator", "skill-001-hello-world"],
+    "edges": [
+      { "from": "genesis", "to": "registry" },
+      { "from": "registry", "to": "orchestrator" }
+    ]
+  },
+  "execution_order": ["genesis", "registry", "orchestrator", "skill-001-hello-world"]
+}
